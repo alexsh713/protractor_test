@@ -2,9 +2,17 @@
 
 
 
-describe('wifi_config', function() {
-  it('wifi_basic', function() {
-    function makeSSID() {
+describe('validate_fields', function() {
+  
+  var ssidName = element(by.model('wifi.ap.data.SSID'));
+  var maxAssocClients = element(by.model('wifi.ap.data.MaxAssociatedDevices'));
+  var shapingButton = element(by.model('wifi.advancedAp.bandwidthRestrictedEnable'));
+  var shapingField = element(by.model('wifi.ap.data.BandwidthRestricted'));
+  var pskKey = element(by.model('wifi.ap.data.Security.PreSharedKey'));
+  var wifi_basic = element(by.css('[ui-sref="wifi.common"]'));
+  var EC = protractor.ExpectedConditions;
+
+  function makeSSID() {
         var text = "";
         var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
@@ -13,6 +21,16 @@ describe('wifi_config', function() {
 
         return text;
     };
+
+   function wait(element) {
+       browser.wait(function() {
+            return element.isPresent()});
+   };
+  
+
+
+  it('wifi_basic', function() {
+    
     
     browser.get('http://192.168.0.1');
     browser.ignoreSynchronization=true;
@@ -25,21 +43,21 @@ describe('wifi_config', function() {
         return element(by.model("password.value")).isPresent()});
 
     browser.wait(function() {
-        return element(by.buttonText("Login")).isPresent()});
+        return element(by.binding("btnLogin")).isPresent()});
     //---------------------------------------------------------
 
     
     //login to the router-----------------------------------
     element(by.model('fm.username')).sendKeys('admin');
     element(by.model('password.value')).sendKeys('1');
-    element(by.buttonText('Login')).click();
+    element(by.binding('btnLogin')).click();
     //-----------------------------------------------------
     
 
     //set ssid names-------------------------------------
     function config_ssid(ssid_name) {
         element(by.model('wifi.ap.data.SSID')).clear();
-        element(by.model('wifi.ap.data.SSID')).sendKeys(ssid_name);
+        //element(by.model('wifi.ap.data.SSID')).sendKeys(ssid_name);
         element(by.buttonText('Apply')).click();
     };
     
