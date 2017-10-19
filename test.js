@@ -33,7 +33,7 @@ describe('validate_fields', function() {
         element(by.buttonText('Apply')).click();
     };
   
-  beforeEach(function() {
+  /*beforeEach(function() {
     browser.get('http://192.168.0.1');
     browser.ignoreSynchronization=true;
     //wait for login form
@@ -54,13 +54,31 @@ describe('validate_fields', function() {
     wifi_basic.click();
 
 
-  });
+  });*/
 
 
   it('config_ssid', function() {
-    
+    browser.get('http://192.168.0.1');
+    browser.ignoreSynchronization=true;
+    //wait for login form
+    wait(element(by.model("fm.username")));
+    wait(element(by.model("password.value")));
+    wait(element(by.binding("btnLogin")));
+    //login to the router
+    element(by.model('fm.username')).sendKeys('admin');
+    element(by.model('password.value')).sendKeys('1');
+    element(by.binding('btnLogin')).click();
+    //wifi menu
+    var wifi = element.all(by.repeater('menu in menuList')).filter(function(elem, index) {
+        return elem.getText().then(function(text){
+            return text == 'Wi-Fi';
+        });
+    }).click();
+
+    wifi_basic.click();
 
    //wait for ssid 2.4 input and config it-------------------------
+    
     wait(element(by.model("wifi.ap.data.SSID")));
     
     config_ssid(makeSSID());
@@ -90,6 +108,7 @@ describe('validate_fields', function() {
     
   });
   it('validate_ssid', function(){
+    browser.sleep(5000);
     wait(element(by.model("wifi.ap.data.SSID")));
     ssidName.clear();
     element(by.buttonText('Apply')).click();
