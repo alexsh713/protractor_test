@@ -26,73 +26,47 @@ describe('validate_fields', function() {
        browser.wait(function() {
             return element.isPresent()});
    };
+
+   function config_ssid(ssid_name) {
+        ssidName.clear();
+        ssidName.sendKeys(ssid_name);
+        element(by.buttonText('Apply')).click();
+    };
   
-
-
-  it('wifi_basic', function() {
-    
-    
+  beforeEach(function() {
     browser.get('http://192.168.0.1');
     browser.ignoreSynchronization=true;
-    
-    //wait for login form-----------------------------------
-    browser.wait(function() {
-        return element(by.model("fm.username")).isPresent()});
-
-    browser.wait(function() {
-        return element(by.model("password.value")).isPresent()});
-
-    browser.wait(function() {
-        return element(by.binding("btnLogin")).isPresent()});
-    //---------------------------------------------------------
-
-    
-    //login to the router-----------------------------------
+    //wait for login form
+    wait(element(by.model("fm.username")));
+    wait(element(by.model("password.value")));
+    wait(element(by.binding("btnLogin")));
+    //login to the router
     element(by.model('fm.username')).sendKeys('admin');
     element(by.model('password.value')).sendKeys('1');
     element(by.binding('btnLogin')).click();
-    //-----------------------------------------------------
-    
-
-    //set ssid names-------------------------------------
-    function config_ssid(ssid_name) {
-        element(by.model('wifi.ap.data.SSID')).clear();
-        //element(by.model('wifi.ap.data.SSID')).sendKeys(ssid_name);
-        element(by.buttonText('Apply')).click();
-    };
-    
-    //----------------------------------------------------
-
-    //wait for element
-    var EC = protractor.ExpectedConditions;
-    
-    //search for wifi menu ---------------------------------------
+    //wifi menu
     var wifi = element.all(by.repeater('menu in menuList')).filter(function(elem, index) {
         return elem.getText().then(function(text){
             return text == 'Wi-Fi';
         });
     }).click();
-    
 
-    //browser.wait(EC.visibilityOf(wifi), 5000);
-    //wifi.click();
-    //----------------------------------------------------------
-    
-    
-    //click wifi->basic-----------------------------------------
-    var wifi_basic = element(by.css('[ui-sref="wifi.common"]'));
     wifi_basic.click();
-    //----------------------------------------------------------
+
+
+  });
+
+
+  it('config_ssid', function() {
     
 
    //wait for ssid 2.4 input and config it-------------------------
-    browser.wait(function() {
-      return element(by.model("wifi.ap.data.SSID")).isPresent()});
-
+    wait(element(by.model("wifi.ap.data.SSID")));
+    
     config_ssid(makeSSID());
-    var error = element(by.cssContainingText('.ng-binding', 'Field is mandatory'));
-    //console.log(myElement.getText());
-    browser.wait(EC.visibilityOf(error), 5000);
+    
+    //var error = element(by.cssContainingText('.ng-binding', 'Field is mandatory'));
+    //browser.wait(EC.visibilityOf(error), 5000);
    
    //go to 5g ssid-------------------------------------------------------
     /*var wifi_5g = element.all(by.repeater('key in wifi.band.list')).get(1);
@@ -115,6 +89,15 @@ describe('validate_fields', function() {
     //browser.sleep(10000);
     
   });
+  it('validate_ssid', function(){
+    wait(element(by.model("wifi.ap.data.SSID")));
+    ssidName.clear();
+    element(by.buttonText('Apply')).click();
+    var error = element(by.cssContainingText('.ng-binding', 'Field is mandatory'));
+    browser.wait(EC.visibilityOf(error), 5000);
+  });
+
+
 });
 
 
