@@ -4,12 +4,20 @@
 
 describe('wifi_config', function() {
   it('wifi_basic', function() {
+    function makeSSID() {
+        var text = "";
+        var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+        for (var i = 0; i < 10; i++)
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+        return text;
+    };
     
-    
-    
-    browser.get('http://192.168.0.50');
+    browser.get('http://192.168.0.1');
     browser.ignoreSynchronization=true;
     
+    //wait for login form-----------------------------------
     browser.wait(function() {
         return element(by.model("fm.username")).isPresent()});
 
@@ -18,54 +26,75 @@ describe('wifi_config', function() {
 
     browser.wait(function() {
         return element(by.buttonText("Login")).isPresent()});
+    //---------------------------------------------------------
 
-
-
+    
+    //login to the router-----------------------------------
     element(by.model('fm.username')).sendKeys('admin');
     element(by.model('password.value')).sendKeys('1');
     element(by.buttonText('Login')).click();
-
+    //-----------------------------------------------------
     
+
+    //set ssid names-------------------------------------
     function config_ssid(ssid_name) {
         element(by.model('wifi.ap.data.SSID')).clear();
         element(by.model('wifi.ap.data.SSID')).sendKeys(ssid_name);
         element(by.buttonText('Apply')).click();
     };
     
+    //----------------------------------------------------
+
+    //wait for element
     var EC = protractor.ExpectedConditions;
-    var first = element.all(by.repeater('menu in menuList')).get(4);
-    browser.wait(EC.visibilityOf(first), 5000);
-    first.click();
     
+    //search for wifi menu ---------------------------------------
+    var wifi = element.all(by.repeater('menu in menuList')).filter(function(elem, index) {
+        return elem.getText().then(function(text){
+            return text == 'Wi-Fi';
+        });
+    }).click();
+    
+
+    //browser.wait(EC.visibilityOf(wifi), 5000);
+    //wifi.click();
+    //----------------------------------------------------------
+    
+    
+    //click wifi->basic-----------------------------------------
     var wifi_basic = element(by.css('[ui-sref="wifi.common"]'));
-    /*browser.wait(EC.visibilityOf(wifi_basic), 5000);
-    wifi_basic.click();*/
     wifi_basic.click();
-
-    browser.wait(function() {
-        return element(by.model("wifi.ap.data.SSID")).isPresent()});
-
-    /*element(by.model('wifi.ap.data.SSID')).clear();
-    element(by.model('wifi.ap.data.SSID')).sendKeys('bungalo1_1224');
-    element(by.buttonText('Apply')).click();*/
-    config_ssid('bungal234234o228');
+    //----------------------------------------------------------
     
-    var wifi_5g = element.all(by.repeater('key in wifi.band.list')).get(1);
+
+   //wait for ssid 2.4 input and config it-------------------------
+    browser.wait(function() {
+      return element(by.model("wifi.ap.data.SSID")).isPresent()});
+
+    config_ssid(makeSSID());
+    var error = element(by.cssContainingText('.ng-binding', 'Field is mandatory'));
+    //console.log(myElement.getText());
+    browser.wait(EC.visibilityOf(error), 5000);
+   
+   //go to 5g ssid-------------------------------------------------------
+    /*var wifi_5g = element.all(by.repeater('key in wifi.band.list')).get(1);
     browser.wait(EC.visibilityOf(wifi_5g), 40000);
-    wifi_5g.click();
+    wifi_5g.click();*/
+    //---------------------------------------------------------------------
 
-    browser.wait(function() {
+   
+    //config 5g ssid----------------------------------------------
+    /*browser.wait(function() {
         return element(by.model("wifi.ap.data.SSID")).isPresent()});
-    config_ssid('bungalo234234228-5g');
-
-    /*element(by.model('wifi.ap.data.SSID')).clear();
-    element(by.model('wifi.ap.data.SSID')).sendKeys('bungalo121_5');
-    element(by.buttonText('Apply')).click();*/
-    
-    
+    config_ssid('bungalo234234228-5g');*/
+    //-------------------------------------------------------------
 
     
-    browser.sleep(10000);
+    
+    
+
+    
+    //browser.sleep(10000);
     
   });
 });
