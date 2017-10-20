@@ -10,6 +10,10 @@ describe('validate_fields', function() {
   var shapingField = element(by.model('wifi.ap.data.BandwidthRestricted'));
   var pskKey = element(by.model('wifi.ap.data.Security.PreSharedKey'));
   var wifi_basic = element(by.css('[ui-sref="wifi.common"]'));
+  var wireless_mode = element(by.model('wifi.general.data.OperatingStandards'));
+  var selectChannelAutomaticly = element(by.model('wifi.general.data.AutoChannelEnable'));
+  var applyButton = element(by.binding('apply'));
+  var channelList = element(by.css('[ng-click="!wifi.general.data.AutoChannelEnable && wifi.general.selectWifiChannel(wifi.band.state)"]'));
   var EC = protractor.ExpectedConditions;
 
   function makeSSID() {
@@ -31,6 +35,13 @@ describe('validate_fields', function() {
         ssidName.clear();
         ssidName.sendKeys(ssid_name);
         element(by.buttonText('Apply')).click();
+    };
+
+    function refresh() {
+      browser.refresh();
+      browser.switchTo().alert().then(function(alert) {
+        alert.accept();
+      });
     };
   
   /*beforeEach(function() {
@@ -58,7 +69,7 @@ describe('validate_fields', function() {
 
 
   it('config_ssid', function() {
-    browser.get('http://192.168.0.1');
+    browser.get('http://192.168.1.1');
     browser.ignoreSynchronization=true;
     //wait for login form
     wait(element(by.model("fm.username")));
@@ -107,16 +118,53 @@ describe('validate_fields', function() {
     //browser.sleep(10000);
     
   });
-  it('validate_ssid', function(){
+  it('it should show error', function(){
     browser.sleep(5000);
+
     wait(element(by.model("wifi.ap.data.SSID")));
     ssidName.clear();
     element(by.buttonText('Apply')).click();
     var error = element(by.cssContainingText('.ng-binding', 'Field is mandatory'));
     browser.wait(EC.visibilityOf(error), 5000);
+    //expect(element(by.css('.nwfield_valid')).isDisplayed()).toBeTruthy();
   });
 
+
+  it('it should show password required', function(){
+    refresh();
+    wait(pskKey);
+    pskKey.clear();
+    element(by.buttonText('Apply')).click();
+    var error = element(by.cssContainingText('.ng-binding', 'Field is mandatory'));
+    browser.wait(EC.visibilityOf(error), 5000);
+    //browser.sleep(5000);
+  });
+
+
+  it('click wireless_mode', function(){
+    refresh();
+    wait(wireless_mode);
+    wireless_mode.click();
+    wireless_mode.$('[value="b"]').click();
+    element(by.binding('apply')).click();
+    
+  });
+
+  it('selectChannel' ,function(){
+    browser.wait(EC.visibilityOf(selectChannelAutomaticly), 5000);
+    selectChannelAutomaticly.click();
+    applyButton.click();
+    wait(channelList);
+    channelList.click();
+    browser.sleep(5000);
+
+
+
+
+
+  });
 
 });
 
 
+//https://stackoverflow.com/questions/18406674/a-way-of-clicking-on-hidden-elements-in-protractor-end-to-end-tests
